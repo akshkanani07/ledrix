@@ -45,16 +45,7 @@ export default async function ReportsPage() {
           </p>
         </div>
 
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-9"
-          disabled
-          title="Full workspace report — coming soon"
-        >
-          <Download className="mr-1.5 size-4" />
-          Export All
-        </Button>
+
       </div>
 
       {/* ─── Summary cards ──────────────────────────── */}
