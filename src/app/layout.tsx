@@ -4,6 +4,7 @@ import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { AppProviders } from "@/components/providers/app-providers";
+import { Analytics } from "@vercel/analytics/react"; // ✅ Vercel Analytics import
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -130,6 +131,8 @@ export default function RootLayout({
             <Toaster richColors position="top-right" />
           </TooltipProvider>
         </AppProviders>
+        {/* ✅ Vercel Analytics — પેજ વ્યૂસ અને વિઝિટર ટ્રેક કરવા */}
+        <Analytics />
       </body>
     </html>
   );
