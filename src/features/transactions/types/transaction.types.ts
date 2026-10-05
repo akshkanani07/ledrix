@@ -5,7 +5,12 @@ import type {
 } from "@prisma/client";
 import type { TransactionCreateInput } from "../schemas/transaction.schema";
 
-export type { Transaction, TransactionType, PaymentMethod, TransactionCreateInput };
+export type {
+  Transaction,
+  TransactionType,
+  PaymentMethod,
+  TransactionCreateInput,
+};
 
 export interface TransactionFilters {
   workerId?: string;
@@ -37,15 +42,16 @@ export interface TransactionListItem {
 
 /**
  * Prisma Transaction → DTO.
+ * `worker` is optional — some queries skip the relation join.
  */
 export function toTransactionListItem(
-  tx: Transaction & { worker: { name: string } },
+  tx: Transaction & { worker?: { name: string } },
   runningBalance?: string
 ): TransactionListItem {
   return {
     id: tx.id,
     workerId: tx.workerId,
-    workerName: tx.worker.name,
+    workerName: tx.worker?.name ?? "",
     type: tx.type,
     reason: tx.reason,
     workName: tx.workName,

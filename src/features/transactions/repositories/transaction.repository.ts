@@ -102,7 +102,7 @@ export class TransactionRepository {
   }
 
   async findByWorker(params: { workspaceId: string; workerId: string }) {
-    // ✅ No `worker` include — caller already has worker context
+    // ✅ Include worker — DTO expects it
     return prisma.transaction.findMany({
       where: {
         workspaceId: params.workspaceId,
@@ -110,6 +110,7 @@ export class TransactionRepository {
         deletedAt: null,
       },
       orderBy: [{ date: "asc" }, { createdAt: "asc" }],
+      include: { worker: { select: { name: true } } },
     });
   }
 

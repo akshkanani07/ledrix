@@ -8,15 +8,12 @@ import {
   TrendingUp,
   TrendingDown,
   IndianRupee,
-  Hammer,
-  Wallet,
   Receipt,
-  Download,
-  Share2,
 } from "lucide-react";
 
 import { requireWorkspace } from "@/features/workspace/services/session-workspace";
 import { ledgerService } from "@/features/ledger/services/ledger.service";
+import { ReportActions } from "@/features/reports/components/report-actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -41,38 +38,38 @@ interface LedgerDetailPageProps {
 export async function generateMetadata({
   params,
 }: LedgerDetailPageProps): Promise<Metadata> {
-  const { workerId } = await params;
-  const workspace = await requireWorkspace();
-  const ledger = await ledgerService.getWorkerLedger({
-    workspaceId: workspace.id,
-    workerId,
-  });
+  try {
+    const { workerId } = await params;
+    const workspace = await requireWorkspace();
+    const ledger = await ledgerService.getWorkerLedger({
+      workspaceId: workspace.id,
+      workerId,
+    });
 
-  return {
-    title: ledger ? `Ledger · ${ledger.worker.name}` : "Ledger",
-  };
+    return {
+      title: ledger ? `Ledger · ${ledger.worker.name}` : "Ledger",
+    };
+  } catch {
+    return { title: "Ledger" };
+  }
 }
 
 const TYPE_CONFIG = {
   WORK: {
     label: "Work",
     className: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    icon: Hammer,
   },
   PAYMENT: {
     label: "Payment",
     className: "bg-blue-50 text-blue-700 border-blue-200",
-    icon: Wallet,
   },
   ADVANCE: {
     label: "Advance",
     className: "bg-amber-50 text-amber-700 border-amber-200",
-    icon: TrendingDown,
   },
   DEDUCTION: {
     label: "Deduction",
     className: "bg-purple-50 text-purple-700 border-purple-200",
-    icon: TrendingUp,
   },
 } as const;
 
@@ -139,11 +136,11 @@ export default async function LedgerDetailPage({
       {/* ─── Header ───────────────────────────────────── */}
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="flex items-start gap-4">
-          <Avatar className="size-14">
+          <Avatar className="size-16">
             {worker.photo && (
               <AvatarImage src={worker.photo} alt={worker.name} />
             )}
-            <AvatarFallback className="bg-zinc-900 text-base font-medium text-white">
+            <AvatarFallback className="bg-zinc-900 text-lg font-medium text-white">
               {initials}
             </AvatarFallback>
           </Avatar>
@@ -168,26 +165,12 @@ export default async function LedgerDetailPage({
         </div>
 
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-9"
-            disabled
-            title="PDF export — coming soon"
-          >
-            <Download className="mr-1.5 size-4" />
-            PDF
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-9"
-            disabled
-            title="WhatsApp share — coming soon"
-          >
-            <Share2 className="mr-1.5 size-4" />
-            Share
-          </Button>
+          {/* ✅ PDF, Excel, WhatsApp — Live wire */}
+          <ReportActions
+            workerId={worker.id}
+            workerName={worker.name}
+            workerMobile={worker.mobile}
+          />
           <Button
             asChild
             size="sm"
@@ -228,7 +211,11 @@ export default async function LedgerDetailPage({
             </div>
             <div>
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                {isOwed ? "You Owe Worker" : owes ? "Worker Owes You" : "Balance"}
+                {isOwed
+                  ? "You Owe Worker"
+                  : owes
+                  ? "Worker Owes You"
+                  : "Balance"}
               </p>
               <p className="mt-0.5 text-2xl font-semibold tracking-tight">
                 {formatMoney(Math.abs(balance))}
@@ -327,7 +314,10 @@ export default async function LedgerDetailPage({
               {entries.map((entry) => {
                 const config = TYPE_CONFIG[entry.type];
                 return (
-                  <div key={entry.id} className="rounded-lg border bg-card p-3">
+                  <div
+                    key={entry.id}
+                    className="rounded-lg border bg-card p-3"
+                  >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
                         <Badge variant="outline" className={config.className}>
@@ -377,7 +367,10 @@ export default async function LedgerDetailPage({
                       {formatDate(worker.createdAt)}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="bg-zinc-100 text-zinc-700 border-zinc-200">
+                      <Badge
+                        variant="outline"
+                        className="bg-zinc-100 text-zinc-700 border-zinc-200"
+                      >
                         Opening
                       </Badge>
                     </TableCell>

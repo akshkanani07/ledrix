@@ -12,8 +12,6 @@ import {
   TrendingDown,
   Receipt,
   IndianRupee,
-  Hammer,
-  Wallet,
 } from "lucide-react";
 
 import { requireWorkspace } from "@/features/workspace/services/session-workspace";
@@ -115,17 +113,22 @@ export default async function WorkerDetailPage({
     workerId: worker.id,
   });
 
-  const balance = ledger ? Number(ledger.finalBalance) : Number(worker.openingBalance);
+  const balance = ledger
+    ? Number(ledger.finalBalance)
+    : Number(worker.openingBalance);
   const isOwedToWorker = balance > 0;
   const isWorkerOwes = balance < 0;
 
-  // Serialize transactions for client (reverse chronological for display)
+  // ✅ Serialize transactions with worker fallback
   const transactions = ledger
     ? [...ledger.items]
         .reverse()
         .map(({ tx, runningBalance }) =>
-                    toTransactionListItem(
-            tx as Parameters<typeof toTransactionListItem>[0],
+          toTransactionListItem(
+            {
+              ...tx,
+              worker: { name: worker.name },
+            } as Parameters<typeof toTransactionListItem>[0],
             runningBalance
           )
         )
@@ -353,10 +356,7 @@ export default async function WorkerDetailPage({
               {transactions.map((tx) => {
                 const config = TX_TYPE_CONFIG[tx.type];
                 return (
-                  <div
-                    key={tx.id}
-                    className="rounded-lg border bg-card p-3"
-                  >
+                  <div key={tx.id} className="rounded-lg border bg-card p-3">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
                         <Badge variant="outline" className={config.className}>
@@ -404,10 +404,7 @@ export default async function WorkerDetailPage({
                           {formatDate(tx.date)}
                         </TableCell>
                         <TableCell>
-                          <Badge
-                            variant="outline"
-                            className={config.className}
-                          >
+                          <Badge variant="outline" className={config.className}>
                             {config.label}
                           </Badge>
                         </TableCell>
